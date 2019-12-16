@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dorm.mapper.DormMapper">
+    <!--分页查询-->
+    <select id="getDormitoryList" parameterType="Dorm" resultType="Dorm">
+        select *from dorm
+        <where>
+            <if test="dorm_num !=null and dorm_num !=''">
+                  dorm_num = #{dorm_num},
+            </if>
+        </where>
+        ORDER BY  dorm_id asc
+        limit #{currentPage},#{pageSize}
+    </select>
+    <!--查询数据总数-->
+    <select id="totalCount"  resultType="Integer">
+        select count(dorm_num) from dorm
+        <where>
+            <if test="dorm_num!=null and dorm_num!=0">
+                and  dorm_num = #{dorm_num},
+            </if>
+        </where>
+    </select>
+
+    <!--添加宿舍信息-->
+    <insert id="addDormitory" parameterType="Dorm" keyProperty="dorm_id" useGeneratedKeys="true">
+        insert into dorm (dorm_num,bed_num,bed_count)
+        values(#{dorm_num},#{bed_num},#{bed_count})
+    </insert>
+
+    <!--通过id删除宿舍信息-->
+    <delete id="deleteDormitory" parameterType="Integer" >
+        delete from dorm where dorm_id=#{dorm_id}
+    </delete>
+
+    <select id="findDormitoryById"  parameterType="Integer" resultType="Dorm" >
+        select * from dorm where dorm_id=#{dorm_id}
+    </select>
+
+    <!--修改宿舍信息-->
+    <update id="updateDormitory" parameterType="Dorm">
+        update dorm
+        <set>
+            <if test="dorm_num!=null and dorm_num!=0">
+                dorm_num=#{dorm_num},
+            </if>
+            <if test="bed_num !=null and bed_num !=''">
+                bed_num=#{bed_num},
+            </if>
+            <if test="bed_count !=null and bed_count !=''">
+                bed_count=#{bed_count},
+            </if>
+        </set>
+        where dorm_id = #{dorm_id}
+    </update>
+
+    <!--宿舍人员信息查询信息-->
+    <resultMap type="com.dorm.entity.Dorm" id="cardAndInfo2">
+        <id property="dorm_id" column="dorm_id"/>
+        <result property="dorm_num" column="dorm_num" />
+        <result property="bed_num" column="bed_num" />
+        <result property="bed_count" column="bed_count"/>
+        <collection property="user" ofType="com.dorm.entity.User" javaType="ArrayList">
+            <id property="user_id" column="user_id"/>
+            <result property="user_name" column="user_name"/>
+            <result property="name" column="name"/>
+            <result property="student_sex" column="student_sex"/>
+            <result property="student_age" column="student_age"/>
+            <result property="student_address" column="student_address"/>
+            <result property="student_class" column="student_class"/>
+            <result property="dorm_id" column="dorm_id"/>
+        </collection>
+    </resultMap>
+
+<!--    查看人员信息-->
+    <select id="findDormitoryStudent" parameterType="Dorm" resultMap="cardAndInfo2">
+        SELECT d.*,u.user_id,u.user_name,u.name,u.student_sex,u.student_age,u.student_address,u.student_class
+        FROM dorm d join user u
+        on d.dorm_num = u.dorm_id
+        where d.dorm_num = #{dorm_num}
+    </select>
+
+<!--    获取所有宿舍列表-->
+    <select id="getAll" resultType="Dorm">
+        select * from dorm
+    </select>
+
+    <select id="getEmptyDorm" resultType="Dorm">
+        select * from dorm where bed_count - bed_num != 0
+    </select>
+
+    <update id="arrangeDorm" parameterType="Integer">
+        update dorm
+        <set>
+            <if test="bed_num !=null and bed_num !=0">
+                bed_num= #{bed_num},
+            </if>
+        </set>
+        where dorm_num = #{dorm_num}
+    </update>
+
+    <select id="findBedNum" parameterType="Integer" resultType="Integer">
+        select bed_num from dorm where dorm_num = #{dorm_num}
+    </select>
+</mapper>

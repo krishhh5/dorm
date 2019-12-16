@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dorm.mapper.VisitorMapper">
+    <!--分页查询-->
+    <select id="getVisitorList" parameterType="Visitor" resultType="Visitor">
+        select * from visitor
+        <where>
+            <if test="visitor_name!=null and visitor_name!='' ">
+                  visitor_name like  '%${visitor_name}%'
+            </if>
+        </where>
+        ORDER BY  visitor_id asc
+        limit #{currentPage},#{pageSize}
+    </select>
+
+    <!--查询数据总数-->
+    <select id="totalCount"  resultType="Integer">
+        select count(visitor_id) from visitor
+        <where>
+            <if test="visitor_name!=null and visitor_name!='' ">
+                  visitor_name like  '%${visitor_name}%'
+            </if>
+
+        </where>
+    </select>
+
+    <!--添加学生信息-->
+    <insert id="addVisitor" parameterType="Visitor" keyProperty="visitor_id" useGeneratedKeys="true">
+        insert into visitor (visitor_name,phone,beginTime,remark)
+        values(#{visitor_name},#{phone},now(),#{remark})
+    </insert>
+
+    <select id="getAll" resultType="Visitor">
+        select * from visitor;
+    </select>
+</mapper>

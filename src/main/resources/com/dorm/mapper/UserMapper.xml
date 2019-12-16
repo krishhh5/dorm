@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dorm.mapper.UserMapper">
+
+    <!--添加学生信息-->
+    <insert id="addStudent" parameterType="com.dorm.entity.User" keyProperty="user_id" useGeneratedKeys="true">
+        insert into user (user_id,user_name,student_sex,student_age,name,student_class,student_address,dorm_id,user_right)
+        values(#{user_id},#{user_name},#{student_sex},#{student_age},#{name},#{student_class},#{student_address},#{dorm_id},1)
+    </insert>
+    <select id="findStudentById" parameterType="Integer" resultType="com.dorm.entity.User">
+        select * from user where user_id = #{user_id}
+    </select>
+    <!--修改学生信息-->
+    <update id="updateStudent" parameterType="com.dorm.entity.User">
+        update user
+        <set>
+            <if test="user_id!=null and user_id!=0">
+                user_id=#{user_id},
+            </if>
+            <if test="user_name !=null and user_name !=''">
+                user_name=#{user_name},
+            </if>
+            <if test="student_sex !=null and student_sex !=''">
+                student_sex=#{student_sex},
+            </if>
+            <if test="student_age !=null and student_age !=0">
+                student_age=#{student_age},
+            </if>
+
+            <if test="student_class!=null and student_class!=''">
+                student_class=#{student_class},
+            </if>
+            <if test="student_address !=null and student_address !=''">
+                student_address=#{student_address},
+            </if>
+            <if test="dorm_id!=null and dorm_id!=0">
+                dorm_id=#{dorm_id},
+            </if>
+            <if test="name !=null and name !=''">
+                name=#{name},
+            </if>
+        </set>
+        where user_id = #{user_id}
+    </update>
+
+    <!--通过id删除学生信息-->
+    <delete id="deleteStudent" parameterType="Integer" >
+        delete from user where user_id=#{user_id}
+    </delete>
+
+    <!--分页查询-->
+    <select id="getStudentList" parameterType="com.dorm.entity.User" resultType="com.dorm.entity.User">
+        select * from user
+        <where>
+            <if test="user_name!=null and user_name!='' ">
+                and  user_name like  '%${user_name}%'
+            </if>
+            <if test="user_id!=null and user_id!=0">
+                and  user_id like  '%${user_id}%'
+            </if>
+            <if test="student_class!=null and student_class!=0">
+                and  student_class like  '%${student_class}%'
+            </if>
+            and user_right = 1
+
+        </where>
+        ORDER BY  user_id asc
+        limit #{currentPage},#{pageSize}
+    </select>
+
+    <!--登陆查询-->
+    <select id="findUser" parameterType="com.dorm.entity.User" resultType="com.dorm.entity.User">
+        select * from user
+        <where>
+        <if test="user_name!=null and user_name!='' ">
+            user_name = #{user_name}
+        </if>
+        <if test="user_pass!=null and user_pass!='' ">
+            and user_pass = #{user_pass}
+        </if>
+            <if test="user_right!=null and user_right!='' ">
+                and user_right = #{user_right}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="getAll" resultType="com.dorm.entity.User">
+        select * from user where user_right = 1
+
+    </select>
+
+    <!--查询数据总数-->
+    <select id="totalCount"  resultType="Integer">
+        select count(user_id) from user
+        <where>
+            <if test="user_name!=null and user_name!='' ">
+                and  user_name like  '%${user_name}%'
+            </if>
+            <if test="user_id!=null and user_id!=0">
+                and  user_id like  '%${user_id}%'
+            </if>
+            <if test="student_class!=null and student_class!=0">
+                and  student_class like  '%${student_class}%'
+            </if>
+            and user_right = 1
+        </where>
+    </select>
+</mapper>
